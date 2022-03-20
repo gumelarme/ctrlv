@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/style.css" type="text/css" media="screen" />
+    <title>ctrlv - paste shit</title>
+</head>
+<body>
+    <main>
+        <nav>
+            <header>
+                <h1>Ctrl<span>V</span><h1>
+            </header>
+            <div>
+                <button>New +</button>
+                <input type="text" name="query" placeholder="search note..." />
+            </div>
+            <div>
+                <div id="post-list">
+                    {{ range $i, $post := .Items }}
+                    <input type="radio" name="post" value="{{ $post.Id }}" id="post-{{ $post.Id }}"/>
+                    <label class="post" for="post-{{ $post.Id }}">
+                        <p>{{ $post.Title }}</p>
+                        <p>{{ $post.Content }}</p>
+                        <p>{{ $post.Timestamp }}</p>
+                    </label>
+                    {{ end }}
+                </div>
+            </div>
+        </nav>
+
+        <form id="editor" method="POST">
+            <div id="editor-header">
+                <input id="post-title" type="text" name="Title" value="{{ .Post.Title }}"/>
+                <input type="hidden" name="Id" value="{{ .Post.Id }}" />
+                <div id="control">
+                    <button>Save</button>
+                    <button>Copy</button>
+                    <button>Paste</button>
+                        <select name="visibility">
+                            <option value="public">public</option>
+                            <option value="private">private</option>
+                        </select>
+                        <label for="alias">Alias: </label>
+                        <input type="text" name="alias" value="{{ .Post.Alias }}" />
+                </div>
+            </div>
+            <div id="text-editor">
+                <textarea  name="content">{{ .Post.Content }}</textarea>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

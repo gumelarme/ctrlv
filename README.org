@@ -1,0 +1,12 @@
+* ctrlv
+A private pastebin clone, utilizing AWS dynamodb + lambda.
+Using AWS Free Tier, hosting is virtually free.
+
+** TODO
+- [ ] Authentication
+- [ ] Switch private/public post
+- [ ] Alias
+- [ ] Line numbered text area
+- [ ] Search post
+- [ ] Autosave
+- [ ] Unique sortable short hash

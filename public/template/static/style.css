@@ -1,0 +1,151 @@
+:root {
+    --white: #FFFFFF;
+    --orange: #F18F01;
+    --teal: #048BA8;
+    --navy: #384F6B;
+    --light-navy: #4a709e;
+    --green: #99C24D;
+    --dark-brown: #2F2D2E;
+}
+
+textarea, select, input, button { outline: none; }
+select, button, input {
+    padding: 4px 10px;
+}
+
+html, body {
+    height: 100%;
+}
+
+* {
+    margin:0;
+    box-sizing: border-box;
+}
+
+main{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    height: 100%;
+}
+
+
+main > *{
+    height: 100%;
+}
+
+
+nav{
+    display: flex;
+    flex-direction: column;
+    box-shadow: 20px 20px white;
+    color: var(--white);
+    background: var(--navy);
+    font-size: 0.8em;
+    height: 100vh;
+}
+
+nav > div:not(:first-child) {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 4px;
+    border-right: var(--light-navy) dashed 2px;
+}
+
+nav > div:last-child{
+    flex-grow: 1;
+    overflow: scroll;
+}
+
+header {
+    font-family: monospace;
+    padding: 10px 10px;
+    background: var(--orange);
+}
+
+header > h1{
+    margin: 0;
+    padding: 0;
+}
+
+.post {
+    display: block;
+    font-family: sans-serif;
+    padding: 5px;
+    margin-bottom: 3px;
+    border: 1px solid var(--light-navy);
+}
+
+#post-list input[type=radio]{
+    display: none;
+}
+
+input:checked + .post{
+    text-align: left;
+    font-weight: bold;
+    border: 2px dashed var(--orange);
+    border-top: 2px solid var(--orange);
+    border-bottom: 2px solid var(--orange);
+}
+
+#editor {
+    grid-column: 2 / 7;
+    display: flex;
+    flex-direction: column;
+    background: var(--navy);
+    color: var(--white);
+    font-family: monospace;
+}
+
+#editor-header > *{
+    padding: 10px 10px;
+}
+
+#post-title {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 2.5em;
+    outline: black solid 0;
+    border: black solid 0;
+    border-radius: 0;
+}
+
+
+#text-editor {
+    width: 100%;
+    flex-grow: 1;
+}
+
+#post-title{
+    width: 100%;
+    overflow: scroll;
+    border-bottom:2px;
+    border-style: dashed;
+    border-color: var(--light-navy);
+}
+
+#post-title:focus{
+    border-bottom: 2px dashed var(--orange);
+}
+
+#control > div{
+    display: inline-block;
+}
+
+textarea{
+    background: var(--navy);
+    color: var(--white);
+    width: 100%;
+    height: 100%;
+    resize: none;
+    outline: black solid 0;
+    border-radius: 0;
+    padding: 10px;
+    border-width: 2px 2px 2px 0;
+    border-style: dashed;
+    border-color: var(--light-navy);
+}
+
+textarea:focus{
+    border-color: var(--orange);
+}

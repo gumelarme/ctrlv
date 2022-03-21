@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="assets/style.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/style.css" type="text/css" media="screen" />
     <title>ctrlv - paste shit</title>
 </head>
 <body>
@@ -19,7 +19,12 @@
             <div>
                 <div id="post-list">
                     {{ range $i, $post := .Items }}
-                    <input type="radio" name="post" value="{{ $post.Id }}" id="post-{{ $post.Id }}"/>
+                    <input type="radio"
+                           name="post"
+                           value="{{ $post.Id }}"
+                           id="post-{{ $post.Id }}"
+                           {{ if eq $.Post.Id $post.Id }} checked {{ end }}
+                    >
                     <label class="post" for="post-{{ $post.Id }}">
                         <p>{{ $post.Title }}</p>
                         <p>{{ $post.Content }}</p>
@@ -40,8 +45,12 @@
                     <button>Copy</button>
                     <button>Paste</button>
                         <select name="visibility">
-                            <option value="public" {{ if eq .Post.Visibility "public" }} selected {{ end }}>public</option>
-                            <option value="private" {{ if eq .Post.Visibility "private"  }} selected {{ end }}>private</option>
+                            <option value="public" {{ if eq .Post.Visibility "public" }} selected {{ end }}>
+                                public
+                            </option>
+                            <option value="private" {{ if eq .Post.Visibility "private"  }} selected {{ end }}>
+                                private
+                            </option>
                         </select>
                         <label for="alias">Alias: </label>
                         <input type="text" name="Alias" value="{{ .Post.Alias }}" />
@@ -52,5 +61,6 @@
             </div>
         </form>
     </main>
+    <script type="text/javascript" src="/assets/script.js"></script>
 </body>
 </html>

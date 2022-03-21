@@ -25,14 +25,13 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
-type server struct {
-}
+type server struct{}
 
 func InitServer(e *echo.Echo) {
 	s := server{}
 
 	e.GET("/", s.Index)
-	e.GET("/p/:id", s.Index)
+	e.GET("/p/:id", s.GetPost)
 	e.POST("/p", s.SavePost)
 
 	api := e.Group("/api")

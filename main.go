@@ -19,7 +19,7 @@ func main() {
 	e.Renderer = server.NewRenderer()
 	server.InitServer(e)
 
-	fs := http.FileServer(http.Dir("./public/template/static"))
+	fs := http.FileServer(http.Dir("./public/assets/"))
 
 	e.GET("/assets/*", echo.WrapHandler(http.StripPrefix("/assets/", fs)))
 	e.Logger.Fatal(e.Start(":1234"))

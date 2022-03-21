@@ -12,7 +12,10 @@ import (
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "[${time_rfc3339}] ${method} [${status}] ${uri} (${latency_human}) from ${remote_ip} ${user_agent}\nError: ${error}\n",
+	}))
+
 	e.Renderer = server.NewRenderer()
 	server.InitServer(e)
 

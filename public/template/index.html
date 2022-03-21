@@ -30,20 +30,21 @@
             </div>
         </nav>
 
-        <form id="editor" method="POST">
+        <form id="editor" method="POST" action="/p">
             <div id="editor-header">
                 <input id="post-title" type="text" name="Title" value="{{ .Post.Title }}"/>
                 <input type="hidden" name="Id" value="{{ .Post.Id }}" />
+                <input type="hidden" name="Type" value="note" />
                 <div id="control">
-                    <button>Save</button>
+                    <input type="submit" name="save" value="Save" />
                     <button>Copy</button>
                     <button>Paste</button>
                         <select name="visibility">
-                            <option value="public">public</option>
-                            <option value="private">private</option>
+                            <option value="public" {{ if eq .Post.Visibility "public" }} selected {{ end }}>public</option>
+                            <option value="private" {{ if eq .Post.Visibility "private"  }} selected {{ end }}>private</option>
                         </select>
                         <label for="alias">Alias: </label>
-                        <input type="text" name="alias" value="{{ .Post.Alias }}" />
+                        <input type="text" name="Alias" value="{{ .Post.Alias }}" />
                 </div>
             </div>
             <div id="text-editor">

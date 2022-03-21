@@ -6,7 +6,10 @@ Using AWS Free Tier, hosting is virtually free.
 - [ ] Authentication
 - [ ] Switch private/public post
 - [ ] Alias
-- [ ] Line numbered text area
 - [ ] Search post
 - [ ] Autosave
 - [ ] Unique sortable short hash
+- [ ] Rich text editor
+  - [ ] Line numbered
+  - [ ] Linewrap
+  - [ ] URL highlight

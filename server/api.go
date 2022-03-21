@@ -5,6 +5,7 @@ import (
 
 	"github.com/gumendol/ctrlv/db"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 func (s *server) ApiGetPosts(c echo.Context) error {
@@ -15,23 +16,24 @@ func (s *server) ApiGetPosts(c echo.Context) error {
 	})
 }
 
-func (s *server) SavePost(c echo.Context) error {
+func (s *server) ApiSavePost(c echo.Context) error {
+	post, err := s.doSavePost(c)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusCreated, data(post))
+}
+
+func (s *server) doSavePost(c echo.Context) (*db.Post, error) {
 	var post db.Post
 	if err := c.Bind(&post); err != nil {
-		return err
+		return nil, errors.Wrap(err, "bad request")
 	}
 
-	if c.Request().Method == "PUT" {
-		post.Id = c.Param("id")
-	}
-
-	id, err := post.Save()
+	_, err := post.Save()
 	if err != nil {
-		//TODO wrap error
-		return err
+		return nil, errors.Wrap(err, "failed to save post")
 	}
-
-	return c.JSON(http.StatusCreated, data(echo.Map{
-		"Id": id,
-	}))
+	return &post, nil
 }

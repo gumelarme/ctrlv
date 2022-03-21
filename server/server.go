@@ -32,14 +32,15 @@ func InitServer(e *echo.Echo) {
 	s := server{}
 
 	e.GET("/", s.Index)
+	e.GET("/p/:id", s.Index)
+	e.POST("/p", s.SavePost)
 
 	api := e.Group("/api")
 	{
 		api.GET("", s.ApiIndex)
 
 		api.GET("/post", s.ApiGetPosts)
-		api.POST("/post", s.SavePost)
-		api.PUT("/post/:id", s.SavePost)
+		api.POST("/post", s.ApiSavePost)
 	}
 }
 

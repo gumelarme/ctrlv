@@ -1,6 +1,9 @@
 package server
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/gumendol/ctrlv/db"
 	"github.com/labstack/echo/v4"
 )
@@ -25,4 +28,13 @@ func (s *server) Index(c echo.Context) error {
 		"Items": posts,
 		"Post":  posts[0],
 	})
+}
+
+func (s *server) SavePost(c echo.Context) error {
+	post, err := s.doSavePost(c)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/p/%s", post.Id))
 }

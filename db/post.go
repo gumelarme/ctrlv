@@ -1,8 +1,6 @@
 package db
 
 import (
-	"log"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -21,12 +19,20 @@ const (
 	PostCode PostType = "code"
 )
 
+type Visibility string
+
+const (
+	VisibilityPublic  Visibility = "public"
+	VisibilityPrivate Visibility = "private"
+)
+
 type Post struct {
-	Id      string `json:",omitempty"`
-	Type    PostType
-	Title   string
-	Content string
-	Alias   string `json:",omitempty"`
+	Id         string   `json:",omitempty" form:"Id"`
+	Type       PostType `form:"Type"`
+	Title      string   `form:"Title"`
+	Content    string   `form:"Content"`
+	Visibility string   `form:"Visibility"`
+	Alias      string   `json:",omitempty" form:"Alias"`
 }
 
 func NewPostNote(title, content, alias string) *Post {
@@ -50,17 +56,20 @@ func GetPosts(last map[string]*dynamodb.AttributeValue) []Post {
 	}
 
 	var posts []Post
-	log.Println(*result.Count)
-	if dynamodbattribute.UnmarshalListOfMaps(result.Items, &posts) != nil {
-		log.Println()
-		panic(err)
+	if err := dynamodbattribute.UnmarshalListOfMaps(result.Items, &posts); err != nil {
+		panic(errors.Wrap(err, "error while processing post"))
 	}
 	return posts
 }
 
 func (p *Post) Save() (string, error) {
-	if len(p.Title) == 0 {
-		p.Title = string([]rune(p.Content)[:10]) + "..."
+	contentLength := len(p.Content)
+	if len(p.Title) == 0 && contentLength > 0 {
+		if contentLength > 10 {
+			p.Title = string([]rune(p.Content)[:10]) + "..."
+		} else {
+			p.Title = p.Content
+		}
 	}
 
 	saveExcution := p.updatePost
@@ -92,7 +101,7 @@ func (p *Post) saveNewPost() error {
 
 func (p *Post) updatePost() error {
 	// TODO: update alias
-	exp := "set Type = :type, Title = :title, Content = :content"
+	exp := "set #type = :type, Title = :title, Content = :content, Visibility = :visibility"
 	_, err := db.UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: postTableName,
 		Key: map[string]*dynamodb.AttributeValue{
@@ -111,6 +120,12 @@ func (p *Post) updatePost() error {
 			":content": {
 				S: aws.String(p.Content),
 			},
+			":visibility": {
+				S: aws.String(p.Visibility),
+			},
+		},
+		ExpressionAttributeNames: map[string]*string{
+			"#type": aws.String("Type"),
 		},
 	})
 	return errors.Wrapf(err, "error while updating post %s", p.Id)

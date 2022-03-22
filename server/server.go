@@ -38,8 +38,9 @@ func InitServer(e *echo.Echo) {
 	{
 		api.GET("", s.ApiIndex)
 
-		api.GET("/post", s.ApiGetPosts)
-		api.POST("/post", s.ApiSavePost)
+		api.GET("/p", s.ApiGetPosts)
+		api.GET("/p/:id", s.ApiGetPost)
+		api.POST("/p", s.ApiSavePost)
 	}
 }
 

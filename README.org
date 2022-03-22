@@ -2,7 +2,7 @@
 A private pastebin clone, utilizing AWS dynamodb + lambda.
 Using AWS Free Tier, hosting is virtually free.
 
-** TODO
+** Features todo:
 - [ ] Authentication
 - [ ] Switch private/public post
 - [ ] Alias

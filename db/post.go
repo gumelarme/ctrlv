@@ -130,3 +130,7 @@ func (p *Post) updatePost() error {
 	})
 	return errors.Wrapf(err, "error while updating post %s", p.Id)
 }
+
+func (p *Post) Timestamp() string {
+	return GetTimeFromId(p.Id).Format("Mon, 02 Jan 2006 15:04:05")
+}

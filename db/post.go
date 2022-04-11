@@ -7,12 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/gumendol/ctrlv/config"
 	"github.com/pkg/errors"
-)
-
-var (
-	postTableName = aws.String("paste")
-	itemsPerPage  = int64(100)
 )
 
 type Category string
@@ -49,8 +45,8 @@ func NewPostNote(title, content, alias string) *Post {
 
 func GetPosts(last map[string]*dynamodb.AttributeValue) []Post {
 	result, err := db.Scan(&dynamodb.ScanInput{
-		TableName:         postTableName,
-		Limit:             &itemsPerPage,
+		TableName:         &config.Conf.DB.TableName,
+		Limit:             aws.Int64(int64(config.Conf.ItemsPerPage)),
 		ExclusiveStartKey: last,
 	})
 
@@ -98,7 +94,7 @@ func (p *Post) saveNewPost() error {
 	}
 
 	_, err = db.PutItem(&dynamodb.PutItemInput{
-		TableName: postTableName,
+		TableName: &config.Conf.DB.TableName,
 		Item:      item,
 	})
 
@@ -122,7 +118,7 @@ func (p *Post) Timestamp() string {
 
 func GetPost(id string) (*Post, error) {
 	output, err := db.GetItem(&dynamodb.GetItemInput{
-		TableName: postTableName,
+		TableName: &config.Conf.DB.TableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: &id,
@@ -156,7 +152,7 @@ func UpdatePostByMap(id string, data map[string]string) (*Post, error) {
 
 	// TODO: update alias
 	_, err := db.UpdateItem(&dynamodb.UpdateItemInput{
-		TableName: postTableName,
+		TableName: &config.Conf.DB.TableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: aws.String(id),

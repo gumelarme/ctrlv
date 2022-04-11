@@ -47,3 +47,15 @@ func (s *server) SavePost(c echo.Context) error {
 	invalidateCache()
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/p/%s", post.Id))
 }
+
+func (s *server) DeletePost(c echo.Context) error {
+	var post db.Post
+	c.Bind(&post)
+
+	if err := db.Delete(post.Id); err != nil {
+		return err
+	}
+
+	invalidateCache()
+	return c.Redirect(http.StatusSeeOther, "/")
+}

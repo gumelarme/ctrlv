@@ -41,7 +41,8 @@
                 <input type="hidden" name="Id" value="{{ .Post.Id }}" />
                 <input type="hidden" name="Category" value="note" />
                 <div id="control">
-                    <input type="submit" name="save" value="Save" />
+                    <input type="submit" name="action" value="Save" formaction="/p"/>
+                    <input type="submit" name="action" value="Delete" formaction="/p/delete"/>
                     <button>Copy</button>
                     <button>Paste</button>
                         <select name="visibility">

@@ -12,11 +12,11 @@ var (
 	itemsPerPage  = int64(100)
 )
 
-type PostType string
+type Category string
 
 const (
-	PostNote PostType = "note"
-	PostCode PostType = "code"
+	PostNote Category = "note"
+	PostCode Category = "code"
 )
 
 type Visibility string
@@ -27,20 +27,20 @@ const (
 )
 
 type Post struct {
-	Id         string   `json:",omitempty" form:"Id"`
-	Type       PostType `form:"Type"`
-	Title      string   `form:"Title"`
-	Content    string   `form:"Content"`
-	Visibility string   `form:"Visibility"`
+	Id         string   `form:"Id"`
+	Category   Category `json:",omitempty" form:"Category"`
+	Title      string   `json:",omitempty" form:"Title"`
+	Content    string   `json:",omitempty" form:"Content"`
+	Visibility string   `json:",omitempty" form:"Visibility"`
 	Alias      string   `json:",omitempty" form:"Alias"`
 }
 
 func NewPostNote(title, content, alias string) *Post {
 	return &Post{
-		Type:    PostNote,
-		Title:   title,
-		Content: content,
-		Alias:   alias,
+		Category: PostNote,
+		Title:    title,
+		Content:  content,
+		Alias:    alias,
 	}
 }
 
@@ -72,13 +72,16 @@ func (p *Post) Save() (string, error) {
 		}
 	}
 
-	saveExcution := p.updatePost
-	if len(p.Id) == 0 {
-		p.Id = NewULID()
-		saveExcution = p.saveNewPost
+	saveFunc := func() error {
+		return p.updatePost(p.Id, *p)
 	}
 
-	if err := saveExcution(); err != nil {
+	if len(p.Id) == 0 {
+		p.Id = NewULID()
+		saveFunc = p.saveNewPost
+	}
+
+	if err := saveFunc(); err != nil {
 		return "", errors.Wrap(err, "error while saving post")
 	}
 	return p.Id, nil
@@ -99,9 +102,9 @@ func (p *Post) saveNewPost() error {
 	return errors.Wrap(err, "error while creating new post")
 }
 
-func (p *Post) updatePost() error {
+func (p *Post) updatePost(id string, post Post) error {
 	// TODO: update alias
-	exp := "set #type = :type, Title = :title, Content = :content, Visibility = :visibility"
+	exp := "set Category = :category, Title = :title, Content = :content, Visibility = :visibility"
 	_, err := db.UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: postTableName,
 		Key: map[string]*dynamodb.AttributeValue{
@@ -111,9 +114,6 @@ func (p *Post) updatePost() error {
 		},
 		UpdateExpression: &exp,
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":type": {
-				S: aws.String(string(p.Type)),
-			},
 			":title": {
 				S: aws.String(p.Title),
 			},
@@ -123,14 +123,41 @@ func (p *Post) updatePost() error {
 			":visibility": {
 				S: aws.String(p.Visibility),
 			},
-		},
-		ExpressionAttributeNames: map[string]*string{
-			"#type": aws.String("Type"),
+			":category": {
+				S: aws.String(string(p.Category)),
+			},
 		},
 	})
-	return errors.Wrapf(err, "error while updating post %s", p.Id)
+
+	if err != nil {
+		return errors.Wrapf(err, "error while updating post %s", p.Id)
+	}
+
+	return nil
 }
 
 func (p *Post) Timestamp() string {
 	return GetTimeFromId(p.Id).Format("Mon, 02 Jan 2006 15:04:05")
+}
+
+func GetPost(id string) (*Post, error) {
+	output, err := db.GetItem(&dynamodb.GetItemInput{
+		TableName: postTableName,
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				S: &id,
+			},
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var post Post
+	if err := dynamodbattribute.UnmarshalMap(output.Item, &post); err != nil {
+		return nil, err
+	}
+
+	return &post, nil
 }

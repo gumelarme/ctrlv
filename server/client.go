@@ -4,15 +4,22 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gumendol/ctrlv/db"
 	"github.com/labstack/echo/v4"
 )
 
 // Index is the main page
 func (s *server) Index(c echo.Context) error {
 	posts := getAllPost()
+
+	var post db.Post
+	if len(posts) > 0 {
+		post = posts[0]
+	}
+
 	return c.Render(200, "index.html", echo.Map{
 		"Items": posts,
-		"Post":  posts[0],
+		"Post":  post,
 	})
 }
 

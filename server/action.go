@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"sort"
 	"strings"
@@ -63,8 +62,14 @@ func (s *server) doGetPostById(id string) (*db.Post, error) {
 	}
 
 	if index == -1 {
-		// TODO: directly query the db
-		return nil, fmt.Errorf("post with id `%s` is not found", id)
+		// TODO: Better error message, hide aws error
+		post, err := db.GetPost(id)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, *post)
+		return post, nil
 	}
 
 	return &posts[index], nil

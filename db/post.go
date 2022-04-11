@@ -1,6 +1,9 @@
 package db
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -73,7 +76,7 @@ func (p *Post) Save() (string, error) {
 	}
 
 	saveFunc := func() error {
-		return p.updatePost(p.Id, *p)
+		return p.updatePost(*p)
 	}
 
 	if len(p.Id) == 0 {
@@ -102,38 +105,15 @@ func (p *Post) saveNewPost() error {
 	return errors.Wrap(err, "error while creating new post")
 }
 
-func (p *Post) updatePost(id string, post Post) error {
-	// TODO: update alias
-	exp := "set Category = :category, Title = :title, Content = :content, Visibility = :visibility"
-	_, err := db.UpdateItem(&dynamodb.UpdateItemInput{
-		TableName: postTableName,
-		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				S: aws.String(p.Id),
-			},
-		},
-		UpdateExpression: &exp,
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
-			":title": {
-				S: aws.String(p.Title),
-			},
-			":content": {
-				S: aws.String(p.Content),
-			},
-			":visibility": {
-				S: aws.String(p.Visibility),
-			},
-			":category": {
-				S: aws.String(string(p.Category)),
-			},
-		},
-	})
-
-	if err != nil {
-		return errors.Wrapf(err, "error while updating post %s", p.Id)
+func (p *Post) updatePost(post Post) error {
+	data := map[string]string{
+		"Title":      post.Title,
+		"Category":   string(post.Category),
+		"Content":    post.Content,
+		"Visibility": post.Visibility,
 	}
-
-	return nil
+	_, err := UpdatePostByMap(p.Id, data)
+	return err
 }
 
 func (p *Post) Timestamp() string {
@@ -160,4 +140,35 @@ func GetPost(id string) (*Post, error) {
 	}
 
 	return &post, nil
+}
+
+func UpdatePostByMap(id string, data map[string]string) (*Post, error) {
+	keys := []string{"Title", "Category", "Content", "Visibility"}
+
+	var columns []string
+	attrValue := make(map[string]*dynamodb.AttributeValue)
+	for _, k := range keys {
+		if val, ok := data[k]; ok {
+			attrValue[":"+k] = &dynamodb.AttributeValue{S: &val}
+			columns = append(columns, fmt.Sprintf("%s = :%s", k, k))
+		}
+	}
+
+	// TODO: update alias
+	_, err := db.UpdateItem(&dynamodb.UpdateItemInput{
+		TableName: postTableName,
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				S: aws.String(id),
+			},
+		},
+		UpdateExpression:          aws.String("set " + strings.Join(columns, ", ")),
+		ExpressionAttributeValues: attrValue,
+	})
+
+	if err != nil {
+		return nil, errors.Wrapf(err, "error while updating post %s", id)
+	}
+
+	return GetPost(id)
 }

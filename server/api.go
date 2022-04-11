@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/gumendol/ctrlv/db"
 	"github.com/labstack/echo/v4"
 )
 
@@ -33,6 +34,20 @@ func (s *server) ApiGetPosts(c echo.Context) error {
 // ApiSavePost take a whole Post object and upsert it
 func (s *server) ApiSavePost(c echo.Context) error {
 	post, err := s.doSavePost(c)
+	if err != nil {
+		return err
+	}
+
+	invalidateCache()
+	return c.JSON(http.StatusCreated, data(post))
+}
+
+// ApiUpdatePost update a post
+func (s *server) ApiUpdatePost(c echo.Context) error {
+	body := make(map[string]string)
+	c.Bind(&body)
+	post, err := db.UpdatePostByMap(c.Param("id"), body)
+
 	if err != nil {
 		return err
 	}

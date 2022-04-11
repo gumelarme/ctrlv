@@ -55,3 +55,13 @@ func (s *server) ApiUpdatePost(c echo.Context) error {
 	invalidateCache()
 	return c.JSON(http.StatusCreated, data(post))
 }
+
+// ApiDeletePost delete a post
+func (s *server) ApiDeletePost(c echo.Context) error {
+	if err := db.Delete(c.Param("id")); err != nil {
+		return err
+	}
+
+	invalidateCache()
+	return c.NoContent(http.StatusNoContent)
+}

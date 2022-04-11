@@ -34,6 +34,7 @@ type Post struct {
 	Alias      string   `json:",omitempty" form:"Alias"`
 }
 
+// NewPostNote create and return a post object pointer
 func NewPostNote(title, content, alias string) *Post {
 	return &Post{
 		Category: PostNote,
@@ -43,6 +44,7 @@ func NewPostNote(title, content, alias string) *Post {
 	}
 }
 
+// GetMultiple post
 func GetPosts(last map[string]*dynamodb.AttributeValue) []Post {
 	result, err := db.Scan(&dynamodb.ScanInput{
 		TableName:         &config.Conf.DB.TableName,
@@ -61,6 +63,7 @@ func GetPosts(last map[string]*dynamodb.AttributeValue) []Post {
 	return posts
 }
 
+// Save upsert a post
 func (p *Post) Save() (string, error) {
 	contentLength := len(p.Content)
 	if len(p.Title) == 0 && contentLength > 0 {
@@ -86,6 +89,7 @@ func (p *Post) Save() (string, error) {
 	return p.Id, nil
 }
 
+// saveNewPost save new post to database
 func (p *Post) saveNewPost() error {
 	// TODO: save alias to index
 	item, err := dynamodbattribute.MarshalMap(p)
@@ -101,6 +105,7 @@ func (p *Post) saveNewPost() error {
 	return errors.Wrap(err, "error while creating new post")
 }
 
+// updatePost update post by post object
 func (p *Post) updatePost(post Post) error {
 	data := map[string]string{
 		"Title":      post.Title,
@@ -112,10 +117,12 @@ func (p *Post) updatePost(post Post) error {
 	return err
 }
 
+// Timestamp return timestamp acquired from the ID (ULID)
 func (p *Post) Timestamp() string {
 	return GetTimeFromId(p.Id).Format("Mon, 02 Jan 2006 15:04:05")
 }
 
+// GetPost get a post by id
 func GetPost(id string) (*Post, error) {
 	output, err := db.GetItem(&dynamodb.GetItemInput{
 		TableName: &config.Conf.DB.TableName,
@@ -138,6 +145,7 @@ func GetPost(id string) (*Post, error) {
 	return &post, nil
 }
 
+// UpdatePostByMap update a post by id and a map of data
 func UpdatePostByMap(id string, data map[string]string) (*Post, error) {
 	keys := []string{"Title", "Category", "Content", "Visibility"}
 
@@ -167,4 +175,17 @@ func UpdatePostByMap(id string, data map[string]string) (*Post, error) {
 	}
 
 	return GetPost(id)
+}
+
+// Delete a post by id
+func Delete(id string) error {
+	_, err := db.DeleteItem(&dynamodb.DeleteItemInput{
+		TableName: &config.Conf.DB.TableName,
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				S: &id,
+			},
+		},
+	})
+	return err
 }

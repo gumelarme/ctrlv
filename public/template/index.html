@@ -13,7 +13,7 @@
                 <h1>Ctrl<span>V</span><h1>
             </header>
             <div>
-                <button>New +</button>
+                <button id="btn-new">New +</button>
                 <input type="text" name="query" placeholder="search note..." />
             </div>
             <div>
@@ -45,16 +45,16 @@
                     <input type="submit" name="action" value="Delete" formaction="/p/delete"/>
                     <button>Copy</button>
                     <button>Paste</button>
-                        <select name="visibility">
-                            <option value="public" {{ if eq .Post.Visibility "public" }} selected {{ end }}>
-                                public
-                            </option>
-                            <option value="private" {{ if eq .Post.Visibility "private"  }} selected {{ end }}>
-                                private
-                            </option>
-                        </select>
-                        <label for="alias">Alias: </label>
-                        <input type="text" name="Alias" value="{{ .Post.Alias }}" />
+                    <select name="Visibility">
+                        <option value="public" {{ if eq .Post.Visibility "public" }} selected {{ end }}>
+                            public
+                        </option>
+                        <option value="private" {{ if eq .Post.Visibility "private"  }} selected {{ end }}>
+                            private
+                        </option>
+                    </select>
+                    <label for="alias">Alias: </label>
+                    <input type="text" name="Alias" value="{{ .Post.Alias }}" />
                 </div>
             </div>
             <div id="text-editor">

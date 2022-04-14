@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/gumendol/ctrlv/db"
+	"github.com/gumelarme/ctrlv/db"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )

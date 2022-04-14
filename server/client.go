@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gumendol/ctrlv/db"
+	"github.com/gumelarme/ctrlv/db"
 	"github.com/labstack/echo/v4"
 )
 

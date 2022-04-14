@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/gumendol/ctrlv/config"
+	"github.com/gumelarme/ctrlv/config"
 	"github.com/pkg/errors"
 )
 

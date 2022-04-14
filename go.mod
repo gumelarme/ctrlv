@@ -1,4 +1,4 @@
-module github.com/gumendol/ctrlv
+module github.com/gumelarme/ctrlv
 
 go 1.17
 

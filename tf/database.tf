@@ -1,29 +1,7 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.27"
-    }
-  }
-
-  required_version = ">= 0.14.9"
-}
-
 locals {
-  dynamodb_table     = "ctrlv-data"
+  dynamodb_table     = "ctrlv-db"
   dynamodb_table_gsi = "Alias-Id-Index"
-  region             = "ap-northeast-1"
 }
-
-output "arn_dynamodb" {
-  value = aws_dynamodb_table.ctrlv_db.arn
-}
-
-provider "aws" {
-  profile = "ctrlv"
-  region  = local.region
-}
-
 
 resource "aws_dynamodb_table" "ctrlv_db" {
   name           = local.dynamodb_table
@@ -153,4 +131,3 @@ resource "aws_appautoscaling_policy" "dynamodb_gsi_write_policy" {
     target_value = 70
   }
 }
-

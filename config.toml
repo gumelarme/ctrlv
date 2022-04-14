@@ -1,4 +1,4 @@
 items_per_page = 100
 
 [db]
-table_name = "ctrlv"
+table_name = "ctrlv-db"

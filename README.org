@@ -9,6 +9,8 @@ Using AWS Free Tier, hosting is virtually free.
 - [ ] Search post
 - [ ] Autosave
 - [ ] Unique sortable short hash
+- [ ] Single binary deployment (embed static files)
+- [ ] Terraform
 - [ ] Rich text editor
   - [ ] Line numbered
   - [ ] Linewrap

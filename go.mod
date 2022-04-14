@@ -9,6 +9,8 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
+	github.com/aws/aws-lambda-go v1.29.0 // indirect
+	github.com/awslabs/aws-lambda-go-api-proxy v0.13.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect

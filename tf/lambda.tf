@@ -1,5 +1,5 @@
 resource "aws_iam_role" "role_lambda_backend" {
-  name               = "role-ctrlv-lambda"
+  name               = "ctrlv-lambda-role-${local.unique_id}"
   description        = "execution role for ctrlv backend"
   assume_role_policy = <<EOF
 {
@@ -18,7 +18,7 @@ EOF
 }
 
 resource "aws_iam_policy" "policy_lambda_backend" {
-  name        = "policy-ctrlv-lambda"
+  name        = "ctrlv-lambda-policy-${local.unique_id}"
   description = "policy for backend, granting dynamodb and logs"
   policy      = <<EOF
 {
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "attach_backend_policy" {
 
 resource "aws_lambda_function" "lambda_ctrlv_backend" {
   filename      = "../bin/main.zip"
-  function_name = "ctrlv-backend"
+  function_name = "ctrlv-lambda-${local.unique_id}"
   description   = "ctrlv server"
   role          = aws_iam_role.role_lambda_backend.arn
   handler       = "main"

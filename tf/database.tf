@@ -1,8 +1,3 @@
-locals {
-  dynamodb_table     = "ctrlv-db"
-  dynamodb_table_gsi = "Alias-Id-Index"
-}
-
 resource "aws_dynamodb_table" "ctrlv_db" {
   name           = local.dynamodb_table
   billing_mode   = "PROVISIONED"
@@ -40,6 +35,7 @@ resource "aws_appautoscaling_target" "dynamodb_table_read_target" {
   resource_id        = "table/${local.dynamodb_table}"
   scalable_dimension = "dynamodb:table:ReadCapacityUnits"
   service_namespace  = "dynamodb"
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 }
 
 resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
@@ -48,6 +44,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
   resource_id        = aws_appautoscaling_target.dynamodb_table_read_target.resource_id
   scalable_dimension = aws_appautoscaling_target.dynamodb_table_read_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.dynamodb_table_read_target.service_namespace
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -64,6 +61,7 @@ resource "aws_appautoscaling_target" "dynamodb_table_write_target" {
   resource_id        = "table/${local.dynamodb_table}"
   scalable_dimension = "dynamodb:table:WriteCapacityUnits"
   service_namespace  = "dynamodb"
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 }
 
 resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
@@ -72,6 +70,7 @@ resource "aws_appautoscaling_policy" "dynamodb_table_write_policy" {
   resource_id        = aws_appautoscaling_target.dynamodb_table_write_target.resource_id
   scalable_dimension = aws_appautoscaling_target.dynamodb_table_write_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.dynamodb_table_write_target.service_namespace
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -90,6 +89,7 @@ resource "aws_appautoscaling_target" "dynamodb_gsi_read_target" {
   resource_id        = "table/${local.dynamodb_table}/index/${local.dynamodb_table_gsi}"
   scalable_dimension = "dynamodb:index:ReadCapacityUnits"
   service_namespace  = "dynamodb"
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 }
 
 resource "aws_appautoscaling_policy" "dynamodb_gsi_read_policy" {
@@ -98,6 +98,7 @@ resource "aws_appautoscaling_policy" "dynamodb_gsi_read_policy" {
   resource_id        = aws_appautoscaling_target.dynamodb_gsi_read_target.resource_id
   scalable_dimension = aws_appautoscaling_target.dynamodb_gsi_read_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.dynamodb_gsi_read_target.service_namespace
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
@@ -114,6 +115,7 @@ resource "aws_appautoscaling_target" "dynamodb_gsi_write_target" {
   resource_id        = "table/${local.dynamodb_table}/index/${local.dynamodb_table_gsi}"
   scalable_dimension = "dynamodb:index:WriteCapacityUnits"
   service_namespace  = "dynamodb"
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 }
 
 resource "aws_appautoscaling_policy" "dynamodb_gsi_write_policy" {
@@ -122,6 +124,7 @@ resource "aws_appautoscaling_policy" "dynamodb_gsi_write_policy" {
   resource_id        = aws_appautoscaling_target.dynamodb_gsi_write_target.resource_id
   scalable_dimension = aws_appautoscaling_target.dynamodb_gsi_write_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.dynamodb_gsi_write_target.service_namespace
+  depends_on         = [aws_dynamodb_table.ctrlv_db]
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {

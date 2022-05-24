@@ -1,9 +1,12 @@
 package server
 
 import (
-	"github.com/labstack/echo/v4"
 	"html/template"
 	"io"
+
+	"github.com/gumelarme/ctrlv/db"
+	"github.com/gumelarme/ctrlv/db/mongo"
+	"github.com/labstack/echo/v4"
 )
 
 type Renderer struct {
@@ -25,25 +28,35 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
-type server struct{}
+type server struct {
+	database db.Database
+}
 
 func InitServer(e *echo.Echo) {
-	s := server{}
+	s := server{
+		database: &mongo.MongoAPI{
+			Host:     "localhost",
+			Port:     27017,
+			Username: "root",
+			Password: "example",
+			Database: "ctrlv",
+		},
+	}
 
-	e.GET("/", s.Index)
-	e.GET("/p/:id", s.GetPost)
-	e.POST("/p", s.SavePost)
-	e.POST("/p/delete", s.DeletePost)
+	// e.GET("/", s.Index)
+	// e.GET("/p/:id", s.GetPost)
+	// e.POST("/p", s.SavePost)
+	// e.POST("/p/delete", s.DeletePost)
 
 	api := e.Group("/api")
 	{
 		api.GET("", s.ApiIndex)
 
-		api.GET("/p", s.ApiGetPosts)
-		api.GET("/p/:id", s.ApiGetPost)
+		// api.GET("/p", s.ApiGetPosts)
+		// api.GET("/p/:id", s.ApiGetPost)
 		api.POST("/p", s.ApiSavePost)
-		api.PUT("/p/:id", s.ApiUpdatePost)
-		api.DELETE("/p/:id", s.ApiDeletePost)
+		// api.PUT("/p/:id", s.ApiUpdatePost)
+		// api.DELETE("/p/:id", s.ApiDeletePost)
 	}
 }
 

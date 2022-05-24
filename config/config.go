@@ -6,12 +6,21 @@ import (
 )
 
 type Config struct {
-	ItemsPerPage int `toml:"items_per_page"`
-	DB           DB  `toml:"db"`
+	ItemsPerPage int     `toml:"items_per_page"`
+	DB           DB      `toml:"db"`
+	MongoDB      MongoDB `toml:"mongodb,omitempty"`
 }
 
 type DB struct {
 	TableName string `toml:"table_name"`
+}
+
+type MongoDB struct {
+	Host     string
+	Port     int
+	Username string
+	Password string
+	Database string
 }
 
 var Conf Config

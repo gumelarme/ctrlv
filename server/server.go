@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 
+	"github.com/gumelarme/ctrlv/config"
 	"github.com/gumelarme/ctrlv/db"
 	"github.com/gumelarme/ctrlv/db/mongo"
 	"github.com/labstack/echo/v4"
@@ -35,11 +36,11 @@ type server struct {
 func InitServer(e *echo.Echo) {
 	s := server{
 		database: &mongo.MongoAPI{
-			Host:     "localhost",
-			Port:     27017,
-			Username: "root",
-			Password: "example",
-			Database: "ctrlv",
+			Host:     config.Conf.MongoDB.Host,
+			Port:     config.Conf.MongoDB.Port,
+			Username: config.Conf.MongoDB.Username,
+			Password: config.Conf.MongoDB.Password,
+			Database: config.Conf.MongoDB.Database,
 		},
 	}
 

@@ -2,3 +2,10 @@ items_per_page = 100
 
 [db]
 table_name = "ctrlv-db"
+
+[mongodb]
+host = "localhost"
+port = 27017
+username = "root"
+password = "example"
+database = "ctrlv"

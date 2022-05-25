@@ -10,20 +10,20 @@ import (
 )
 
 // // ApiGetPost get a single post
-// func (s *server) ApiGetPost(c echo.Context) error {
-// 	id := c.Param("id")
-// 	post, err := s.doGetPostById(id)
+func (s *server) ApiGetPost(c echo.Context) error {
+	id := c.Param("id")
+	post, err := s.database.GetPostById(c.Request().Context(), id)
 
-// 	if err != nil {
-// 		return c.JSON(http.StatusNotFound, echo.Map{
-// 			"error": err.Error(),
-// 		})
-// 	}
+	if err != nil {
+		return c.JSON(http.StatusNotFound, echo.Map{
+			"error": err.Error(),
+		})
+	}
 
-// 	return c.JSON(http.StatusOK, data(echo.Map{
-// 		"post": post,
-// 	}))
-// }
+	return c.JSON(http.StatusOK, data(echo.Map{
+		"post": post,
+	}))
+}
 
 // ApiGetPosts get all posts
 // TODO: paginate

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gumelarme/ctrlv/db"
@@ -24,13 +25,19 @@ import (
 // 	}))
 // }
 
-// // ApiGetPosts get all posts
-// // TODO: paginate
-// func (s *server) ApiGetPosts(c echo.Context) error {
-// 	return c.JSON(http.StatusOK, data(echo.Map{
-// 		"posts": getAllPost(),
-// 	}))
-// }
+// ApiGetPosts get all posts
+// TODO: paginate
+func (s *server) ApiGetPosts(c echo.Context) error {
+	posts, err := s.database.GetPosts(c.Request().Context())
+	if err != nil {
+		log.Println(err)
+		return errors.Wrap(err, "error while fetching posts")
+	}
+
+	return c.JSON(http.StatusOK, data(echo.Map{
+		"posts": posts,
+	}))
+}
 
 // ApiSavePost take a whole Post object and upsert it
 func (s *server) ApiSavePost(c echo.Context) error {

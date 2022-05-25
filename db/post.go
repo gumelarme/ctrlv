@@ -14,8 +14,7 @@ const (
 	VisibilityPrivate Visibility = "private"
 )
 
-type Post struct {
-	Id         string   `form:"Id", bson:"_id,omitempty"` // need to be a *primitive.ObjectID
+type PostData struct {
 	Category   Category `json:",omitempty" bson:",omitempty" form:"Category"`
 	Title      string   `json:",omitempty" bson:",omitempty" form:"Title"`
 	Content    string   `json:",omitempty" bson:",omitempty" form:"Content"`
@@ -23,12 +22,19 @@ type Post struct {
 	Alias      string   `json:",omitempty" bson:",omitempty" form:"Alias"`
 }
 
+type Post struct {
+	Id string `form:"Id"`
+	PostData
+}
+
 // NewPostNote create and return a post object pointer
 func NewPostNote(title, content, alias string) *Post {
 	return &Post{
-		Category: PostNote,
-		Title:    title,
-		Content:  content,
-		Alias:    alias,
+		PostData: PostData{
+			Category: PostNote,
+			Title:    title,
+			Content:  content,
+			Alias:    alias,
+		},
 	}
 }

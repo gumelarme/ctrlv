@@ -6,7 +6,7 @@ import (
 
 type Database interface {
 	CreatePost(context.Context, *Post) error
-	// GetPosts() []*Post
+	GetPosts(context.Context) ([]*Post, error)
 	// GetPostById(id string) *Post
 	// SearchPost(keyword string) []Post
 	// UpdatePost(context.Context, id string, *Post) error

@@ -77,3 +77,27 @@ func (m *MongoAPI) CreatePost(ctx context.Context, post *db.Post) error {
 
 	return nil
 }
+
+func (m *MongoAPI) UpdatePost(ctx context.Context, id string, post *db.Post) error {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return fmt.Errorf("the provided id is invalid")
+	}
+
+	p, _ := NewFromPost(*post, false)
+	err = m.withMongo(ctx, func(db *mongo.Database) error {
+		coll := db.Collection("posts")
+		_, err := coll.UpdateByID(ctx, _id, bson.M{"$set": p})
+
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return errors.Wrapf(err, "error while updating post")
+	}
+
+	return nil
+}

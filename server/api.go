@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -54,19 +55,18 @@ func (s *server) ApiSavePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, data(post))
 }
 
-// // ApiUpdatePost update a post
-// func (s *server) ApiUpdatePost(c echo.Context) error {
-// 	body := make(map[string]string)
-// 	c.Bind(&body)
-// 	post, err := db.UpdatePostByMap(c.Param("id"), body)
+// ApiUpdatePost update a post
+func (s *server) ApiUpdatePost(c echo.Context) error {
+	var post *db.Post
+	c.Bind(&post)
+	err := s.database.UpdatePost(c.Request().Context(), c.Param("id"), post)
+	fmt.Println(err)
+	if err != nil {
+		return err
+	}
 
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	invalidateCache()
-// 	return c.JSON(http.StatusCreated, data(post))
-// }
+	return c.JSON(http.StatusCreated, data(post))
+}
 
 // // ApiDeletePost delete a post
 // func (s *server) ApiDeletePost(c echo.Context) error {

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -62,9 +61,15 @@ func (s *server) ApiUpdatePost(c echo.Context) error {
 	post.Id = c.Param("id")
 
 	err := s.database.UpdatePost(c.Request().Context(), post)
-	fmt.Println(err)
 	if err != nil {
 		return err
+	}
+
+	post, err = s.database.GetPostById(c.Request().Context(), post.Id)
+	if err != nil {
+		return c.JSON(http.StatusMultiStatus, echo.Map{
+			"message": "update successul but failed to retrieve the changed post",
+		})
 	}
 
 	return c.JSON(http.StatusCreated, data(post))

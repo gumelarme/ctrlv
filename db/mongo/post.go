@@ -12,9 +12,9 @@ import (
 )
 
 func (m *MongoAPI) GetPostById(ctx context.Context, id string) (*db.Post, error) {
-	_id, err := primitive.ObjectIDFromHex(id)
+	_id, err := isIdValid(id)
 	if err != nil {
-		return nil, fmt.Errorf("the provided id is invalid")
+		return nil, err
 	}
 
 	var post Post
@@ -63,10 +63,9 @@ func (m *MongoAPI) GetPosts(ctx context.Context) ([]*db.Post, error) {
 }
 
 func (m *MongoAPI) CreatePost(ctx context.Context, post *db.Post) error {
-	p, _ := NewFromPost(*post, false)
+	p := Post{PostData: post.PostData}
 	err := m.withMongo(ctx, func(db *mongo.Database) error {
-		posts := db.Collection("posts")
-		res, err := posts.InsertOne(ctx, p)
+		res, err := db.Collection("posts").InsertOne(ctx, p)
 		post.Id = res.InsertedID.(primitive.ObjectID).Hex()
 		return err
 	})
@@ -78,21 +77,16 @@ func (m *MongoAPI) CreatePost(ctx context.Context, post *db.Post) error {
 	return nil
 }
 
-func (m *MongoAPI) UpdatePost(ctx context.Context, id string, post *db.Post) error {
-	_id, err := primitive.ObjectIDFromHex(id)
+func (m *MongoAPI) UpdatePost(ctx context.Context, post *db.Post) error {
+	_id, err := isIdValid(post.Id)
 	if err != nil {
-		return fmt.Errorf("the provided id is invalid")
+		return err
 	}
 
-	p, _ := NewFromPost(*post, false)
+	p := Post{PostData: post.PostData}
 	err = m.withMongo(ctx, func(db *mongo.Database) error {
-		coll := db.Collection("posts")
-		_, err := coll.UpdateByID(ctx, _id, bson.M{"$set": p})
-
-		if err != nil {
-			return err
-		}
-		return nil
+		_, err := db.Collection("posts").UpdateByID(ctx, _id, bson.M{"$set": p})
+		return err
 	})
 
 	if err != nil {
@@ -100,4 +94,35 @@ func (m *MongoAPI) UpdatePost(ctx context.Context, id string, post *db.Post) err
 	}
 
 	return nil
+}
+
+func (m *MongoAPI) DeletePost(ctx context.Context, id string) error {
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	err = m.withMongo(ctx, func(db *mongo.Database) error {
+		_, err := db.Collection("posts").DeleteOne(ctx, bson.M{"_id": _id})
+		return err
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "error while deleting post")
+	}
+
+	return nil
+}
+
+func isIdValid(id string) (primitive.ObjectID, error) {
+	nilid := primitive.NilObjectID
+	if len(id) == 0 {
+		return nilid, fmt.Errorf("invalid empty id")
+	}
+
+	_id, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return primitive.NilObjectID, fmt.Errorf("the provided id is invalid")
+	}
+	return _id, nil
 }

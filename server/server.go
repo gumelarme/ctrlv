@@ -57,7 +57,7 @@ func InitServer(e *echo.Echo) {
 		api.GET("/p/:id", s.ApiGetPost)
 		api.POST("/p", s.ApiSavePost)
 		api.PUT("/p/:id", s.ApiUpdatePost)
-		// api.DELETE("/p/:id", s.ApiDeletePost)
+		api.DELETE("/p/:id", s.ApiDeletePost)
 	}
 }
 

@@ -59,7 +59,9 @@ func (s *server) ApiSavePost(c echo.Context) error {
 func (s *server) ApiUpdatePost(c echo.Context) error {
 	var post *db.Post
 	c.Bind(&post)
-	err := s.database.UpdatePost(c.Request().Context(), c.Param("id"), post)
+	post.Id = c.Param("id")
+
+	err := s.database.UpdatePost(c.Request().Context(), post)
 	fmt.Println(err)
 	if err != nil {
 		return err
@@ -68,12 +70,12 @@ func (s *server) ApiUpdatePost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, data(post))
 }
 
-// // ApiDeletePost delete a post
-// func (s *server) ApiDeletePost(c echo.Context) error {
-// 	if err := db.Delete(c.Param("id")); err != nil {
-// 		return err
-// 	}
+// ApiDeletePost delete a post
+func (s *server) ApiDeletePost(c echo.Context) error {
+	err := s.database.DeletePost(c.Request().Context(), c.Param("id"))
+	if err != nil {
+		return err
+	}
 
-// 	invalidateCache()
-// 	return c.NoContent(http.StatusNoContent)
-// }
+	return c.NoContent(http.StatusNoContent)
+}

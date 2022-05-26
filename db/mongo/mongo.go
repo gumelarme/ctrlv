@@ -16,30 +16,6 @@ type Post struct {
 	db.PostData `bson:",inline"`
 }
 
-func NewFromPost(post db.Post, hasId bool) (*Post, error) {
-	var id primitive.ObjectID
-	var err error
-
-	if hasId {
-		id, err = primitive.ObjectIDFromHex(post.Id)
-		if err != nil {
-			return nil, err
-		}
-
-	}
-
-	return &Post{Id: id, PostData: post.PostData}, nil
-}
-
-func MustNewFromPost(post db.Post) *Post {
-	p, err := NewFromPost(post, true)
-	if err != nil {
-		panic(err)
-	}
-
-	return p
-}
-
 func (p *Post) ToDBPost() *db.Post {
 	return &db.Post{
 		Id:       p.Id.Hex(),

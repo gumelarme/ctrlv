@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// GetPostById return post with given string id
 func (m *MongoAPI) GetPostById(ctx context.Context, id string) (*db.Post, error) {
 	_id, err := isIdValid(id)
 	if err != nil {
@@ -37,6 +38,7 @@ func (m *MongoAPI) GetPostById(ctx context.Context, id string) (*db.Post, error)
 	return post.ToDBPost(), nil
 }
 
+// GetPosts get multiple posts
 func (m *MongoAPI) GetPosts(ctx context.Context) ([]*db.Post, error) {
 	var posts []Post
 
@@ -62,6 +64,7 @@ func (m *MongoAPI) GetPosts(ctx context.Context) ([]*db.Post, error) {
 	return dbPosts, nil
 }
 
+// CreatePost insert the given post to the databse
 func (m *MongoAPI) CreatePost(ctx context.Context, post *db.Post) error {
 	p := Post{PostData: post.PostData}
 	err := m.withMongo(ctx, func(db *mongo.Database) error {
@@ -77,6 +80,7 @@ func (m *MongoAPI) CreatePost(ctx context.Context, post *db.Post) error {
 	return nil
 }
 
+// UpdatePost update post by its id, return error if id is empty
 func (m *MongoAPI) UpdatePost(ctx context.Context, post *db.Post) error {
 	_id, err := isIdValid(post.Id)
 	if err != nil {
@@ -96,6 +100,7 @@ func (m *MongoAPI) UpdatePost(ctx context.Context, post *db.Post) error {
 	return nil
 }
 
+// DeletePost delete post that match the given id
 func (m *MongoAPI) DeletePost(ctx context.Context, id string) error {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -114,10 +119,10 @@ func (m *MongoAPI) DeletePost(ctx context.Context, id string) error {
 	return nil
 }
 
+// isIdValid check if the given id is valid
 func isIdValid(id string) (primitive.ObjectID, error) {
-	nilid := primitive.NilObjectID
 	if len(id) == 0 {
-		return nilid, fmt.Errorf("invalid empty id")
+		return primitive.NilObjectID, fmt.Errorf("invalid empty id")
 	}
 
 	_id, err := primitive.ObjectIDFromHex(id)

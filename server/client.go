@@ -1,27 +1,41 @@
 package server
 
-// import (
-// 	"fmt"
-// 	"net/http"
+import (
+	// "fmt"
+	// "net/http"
 
-// 	"github.com/gumelarme/ctrlv/db"
-// 	"github.com/labstack/echo/v4"
-// )
+	"fmt"
 
-// // Index is the main page
-// func (s *server) Index(c echo.Context) error {
-// 	posts := getAllPost()
+	"github.com/gumelarme/ctrlv/db"
+	"github.com/labstack/echo/v4"
+)
 
-// 	var post db.Post
-// 	if len(posts) > 0 {
-// 		post = posts[0]
-// 	}
+// Index is the main page
+func (s *server) Index(c echo.Context) error {
+	posts, err := s.database.GetPosts(c.Request().Context())
+	if err != nil {
+		return c.Render(500, "500.html", nil)
+	}
 
-// 	return c.Render(200, "index.html", echo.Map{
-// 		"Items": posts,
-// 		"Post":  post,
-// 	})
-// }
+	var post db.Post
+	if len(posts) > 0 {
+		post = *posts[0]
+	}
+
+	var realPosts []db.Post
+	for _, p := range posts {
+		realPosts = append(realPosts, *p)
+
+	}
+
+	err = c.Render(200, "index.html", echo.Map{
+		"Items": posts,
+		"Post":  post,
+	})
+
+	fmt.Println(err)
+	return err
+}
 
 // // GetPost get a post by id
 // func (s *server) GetPost(c echo.Context) error {

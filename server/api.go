@@ -17,6 +17,7 @@ func (s *server) ApiGetPost(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, echo.Map{
 			"error": err.Error(),
+			"nice":  "Hello",
 		})
 	}
 

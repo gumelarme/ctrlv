@@ -17,9 +17,12 @@ type Post struct {
 }
 
 func (p *Post) ToDBPost() *db.Post {
+	data := p.PostData
+	data.CreatedAt = p.Id.Timestamp()
+
 	return &db.Post{
 		Id:       p.Id.Hex(),
-		PostData: p.PostData,
+		PostData: data,
 	}
 }
 

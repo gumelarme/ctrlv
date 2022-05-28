@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
-	"log"
+	"time"
 
 	"github.com/gumelarme/ctrlv/db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -35,20 +35,22 @@ type MongoAPI struct {
 }
 
 func (m *MongoAPI) withMongo(ctx context.Context, f func(*mongo.Database) error) error {
-	connStr := fmt.Sprintf("mongodb://%s:%s@%s:%d/admin?connectTimeoutMS=10000&authSource=admin&authMechanism=SCRAM-SHA-1",
-		m.Username,
-		m.Password,
-		m.Host,
-		m.Port,
-	)
-
+	timeout := time.Second * 3
 	client, err := mongo.Connect(
 		ctx,
-		options.Client().ApplyURI(connStr),
+		&options.ClientOptions{
+			Hosts:          []string{fmt.Sprintf("%s:%d", m.Host, m.Port)},
+			ConnectTimeout: &timeout,
+			Auth: &options.Credential{
+				Username:      m.Username,
+				Password:      m.Password,
+				AuthMechanism: "SCRAM-SHA-1",
+				AuthSource:    "admin",
+			},
+		},
 	)
 
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 

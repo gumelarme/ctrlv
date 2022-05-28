@@ -12,7 +12,7 @@ import (
 func (s *server) Index(c echo.Context) error {
 	posts, err := s.database.GetPosts(c.Request().Context())
 	if err != nil {
-		return c.Render(500, "500.html", nil)
+		return Render500(c, err, "Error while retrieving posts")
 	}
 
 	var post db.Post
@@ -66,7 +66,7 @@ func (s *server) SavePost(c echo.Context) error {
 
 	err = saveAction(c.Request().Context(), &post)
 	if err != nil {
-		return err
+		return Render500(c, err, "Error while saving a post")
 	}
 
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/p/%s", post.Id))
@@ -81,8 +81,21 @@ func (s *server) DeletePost(c echo.Context) error {
 
 	err = s.database.DeletePost(c.Request().Context(), post.Id)
 	if err != nil {
-		return err
+		return Render500(c, err, "Error while deleting post")
 	}
 
 	return c.Redirect(http.StatusSeeOther, "/")
+}
+
+func Render500(c echo.Context, err error, message string) error {
+	return RenderError(c, http.StatusInternalServerError, err, "Internal Server Error", message)
+}
+
+func RenderError(c echo.Context, code int, err error, title, message string) error {
+	fmt.Println(err)
+	return c.Render(code, "error.html", echo.Map{
+		"Code":    code,
+		"Title":   title,
+		"Message": message,
+	})
 }

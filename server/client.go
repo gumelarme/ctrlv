@@ -37,19 +37,20 @@ func (s *server) Index(c echo.Context) error {
 	return err
 }
 
-// // GetPost get a post by id
-// func (s *server) GetPost(c echo.Context) error {
-// 	id := c.Param("id")
-// 	post, err := s.doGetPostById(id)
-// 	if err != nil {
-// 		return c.Render(404, "404.html", nil)
-// 	}
+// GetPost get a post by id
+func (s *server) GetPost(c echo.Context) error {
+	id := c.Param("id")
+	post, err := s.database.GetPostById(c.Request().Context(), id)
+	if err != nil {
+		return c.Render(404, "404.html", nil)
+	}
 
-// 	return c.Render(200, "index.html", echo.Map{
-// 		"Items": getAllPost(),
-// 		"Post":  post,
-// 	})
-// }
+	posts, _ := s.database.GetPosts(c.Request().Context())
+	return c.Render(200, "index.html", echo.Map{
+		"Items": posts,
+		"Post":  post,
+	})
+}
 
 // // SavePost upsert a post, it is the "action" of the index page's form
 // func (s *server) SavePost(c echo.Context) error {

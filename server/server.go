@@ -45,7 +45,7 @@ func InitServer(e *echo.Echo) {
 	}
 
 	e.GET("/", s.Index)
-	// e.GET("/p/:id", s.GetPost)
+	e.GET("/p/:id", s.GetPost)
 	// e.POST("/p", s.SavePost)
 	// e.POST("/p/delete", s.DeletePost)
 

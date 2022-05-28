@@ -46,8 +46,8 @@ func InitServer(e *echo.Echo) {
 
 	e.GET("/", s.Index)
 	e.GET("/p/:id", s.GetPost)
-	// e.POST("/p", s.SavePost)
-	// e.POST("/p/delete", s.DeletePost)
+	e.POST("/p", s.SavePost)
+	e.POST("/p/delete", s.DeletePost)
 
 	api := e.Group("/api")
 	{

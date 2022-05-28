@@ -1,10 +1,8 @@
 package server
 
 import (
-	// "fmt"
-	// "net/http"
-
 	"fmt"
+	"net/http"
 
 	"github.com/gumelarme/ctrlv/db"
 	"github.com/labstack/echo/v4"
@@ -52,25 +50,39 @@ func (s *server) GetPost(c echo.Context) error {
 	})
 }
 
-// // SavePost upsert a post, it is the "action" of the index page's form
-// func (s *server) SavePost(c echo.Context) error {
-// 	post, err := s.doSavePost(c)
-// 	if err != nil {
-// 		return err
-// 	}
+// SavePost upsert a post, it is the "action" of the index page's form
+func (s *server) SavePost(c echo.Context) error {
+	var post db.Post
+	err := c.Bind(&post)
+	if err != nil {
+		// TODO: Bad requets error
+		return err
+	}
 
-// 	invalidateCache()
-// 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/p/%s", post.Id))
-// }
+	saveAction := s.database.CreatePost
+	if len(post.Id) > 0 {
+		saveAction = s.database.UpdatePost
+	}
 
-// func (s *server) DeletePost(c echo.Context) error {
-// 	var post db.Post
-// 	c.Bind(&post)
+	err = saveAction(c.Request().Context(), &post)
+	if err != nil {
+		return err
+	}
 
-// 	if err := db.Delete(post.Id); err != nil {
-// 		return err
-// 	}
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/p/%s", post.Id))
+}
 
-// 	invalidateCache()
-// 	return c.Redirect(http.StatusSeeOther, "/")
-// }
+func (s *server) DeletePost(c echo.Context) error {
+	var post db.Post
+	err := c.Bind(&post)
+	if err != nil {
+		return err
+	}
+
+	err = s.database.DeletePost(c.Request().Context(), post.Id)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/")
+}

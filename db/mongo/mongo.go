@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gumelarme/ctrlv/config"
 	"github.com/gumelarme/ctrlv/db"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -32,6 +33,16 @@ type MongoAPI struct {
 	Username string
 	Password string
 	Database string
+}
+
+func NewMongoAPI() *MongoAPI {
+	return &MongoAPI{
+		Host:     config.MongoDB.Host,
+		Port:     config.MongoDB.Port,
+		Username: config.MongoDB.Username,
+		Password: config.MongoDB.Password,
+		Database: config.MongoDB.Database,
+	}
 }
 
 func (m *MongoAPI) withMongo(ctx context.Context, f func(*mongo.Database) error) error {

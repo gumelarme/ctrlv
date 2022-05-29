@@ -1,9 +1,11 @@
-items_per_page = 100
-
 [db]
+items_per_page = 100
+engine = "mongodb"
+
+[dynamodb]
 table_name = "ctrlv-db"
 
-[mongodb]
+[mongo]
 host = "localhost"
 port = 27017
 username = "root"

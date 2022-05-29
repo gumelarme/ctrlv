@@ -9,6 +9,7 @@ import (
 
 	"github.com/gumelarme/ctrlv/config"
 	"github.com/gumelarme/ctrlv/db"
+	"github.com/gumelarme/ctrlv/db/dynamodb"
 	"github.com/gumelarme/ctrlv/db/mongo"
 	"github.com/labstack/echo/v4"
 )
@@ -33,14 +34,22 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func InitServer(e *echo.Echo) {
+	var database db.Database = mongo.NewMongoAPI()
+	if config.DB.Engine == "dynamodb" {
+		database = dynamodb.NewDynamoDBAPI()
+	}
+
+	switch config.DB.Engine {
+	case "dynamodb":
+		database = dynamodb.NewDynamoDBAPI()
+	case "mongodb":
+		fallthrough
+	default:
+		database = mongo.NewMongoAPI()
+	}
+
 	s := server{
-		database: &mongo.MongoAPI{
-			Host:     config.Conf.MongoDB.Host,
-			Port:     config.Conf.MongoDB.Port,
-			Username: config.Conf.MongoDB.Username,
-			Password: config.Conf.MongoDB.Password,
-			Database: config.Conf.MongoDB.Database,
-		},
+		database: database,
 	}
 
 	e.GET("/", s.Index)
@@ -52,7 +61,6 @@ func InitServer(e *echo.Echo) {
 	api := e.Group("/api")
 	{
 		api.GET("", s.ApiIndex)
-
 		api.GET("/p", s.ApiGetPosts)
 		api.GET("/p/:id", s.ApiGetPost)
 		api.POST("/p", s.ApiSavePost)

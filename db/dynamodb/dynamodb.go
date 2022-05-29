@@ -13,7 +13,7 @@ type DynamoDB struct {
 	db *dynamodb.DynamoDB
 }
 
-func NewDB() *DynamoDB {
+func NewDynamoDBAPI() *DynamoDB {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))

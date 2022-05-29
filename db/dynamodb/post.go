@@ -13,9 +13,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (d *DynamoDB) GetPost(ctx context.Context, id string) (*db.Post, error) {
+func (d *DynamoDB) GetPostById(ctx context.Context, id string) (*db.Post, error) {
 	output, err := d.db.GetItemWithContext(ctx, &dynamodb.GetItemInput{
-		TableName: &config.Conf.DB.TableName,
+		TableName: &config.DynamoDB.TableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: &id,
@@ -35,17 +35,17 @@ func (d *DynamoDB) GetPost(ctx context.Context, id string) (*db.Post, error) {
 	return &post, nil
 }
 
-func (d *DynamoDB) GetPosts(ctx context.Context) ([]db.Post, error) {
+func (d *DynamoDB) GetPosts(ctx context.Context) ([]*db.Post, error) {
 	result, err := d.db.ScanWithContext(ctx, &dynamodb.ScanInput{
-		TableName: &config.Conf.DB.TableName,
-		Limit:     aws.Int64(int64(config.Conf.ItemsPerPage)),
+		TableName: &config.DynamoDB.TableName,
+		Limit:     aws.Int64(int64(config.DB.ItemsPerPage)),
 	})
 
 	if err != nil {
 		panic(err)
 	}
 
-	var posts []db.Post
+	var posts []*db.Post
 	if err := dynamodbattribute.UnmarshalListOfMaps(result.Items, &posts); err != nil {
 		panic(errors.Wrap(err, "error while processing post"))
 	}
@@ -60,7 +60,7 @@ func (d *DynamoDB) CreatePost(ctx context.Context, post *db.Post) error {
 	}
 
 	_, err = d.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: &config.Conf.DB.TableName,
+		TableName: &config.DynamoDB.TableName,
 		Item:      item,
 	})
 
@@ -93,7 +93,7 @@ func (d *DynamoDB) UpdatePostByMap(ctx context.Context, id string, data map[stri
 
 	// TODO: update alias
 	_, err := d.db.UpdateItem(&dynamodb.UpdateItemInput{
-		TableName: &config.Conf.DB.TableName,
+		TableName: &config.DynamoDB.TableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: aws.String(id),
@@ -107,13 +107,13 @@ func (d *DynamoDB) UpdatePostByMap(ctx context.Context, id string, data map[stri
 		return nil, errors.Wrapf(err, "error while updating post %s", id)
 	}
 
-	return d.GetPost(ctx, id)
+	return d.GetPostById(ctx, id)
 }
 
 // Delete a post by id
-func (d *DynamoDB) Delete(ctx context.Context, id string) error {
+func (d *DynamoDB) DeletePost(ctx context.Context, id string) error {
 	_, err := d.db.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
-		TableName: &config.Conf.DB.TableName,
+		TableName: &config.DynamoDB.TableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"Id": {
 				S: &id,

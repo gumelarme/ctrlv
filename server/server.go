@@ -1,8 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"html/template"
 	"io"
+	"net/http"
+	"strings"
 
 	"github.com/gumelarme/ctrlv/config"
 	"github.com/gumelarme/ctrlv/db"
@@ -29,10 +32,6 @@ func (r *Renderer) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return r.templates.ExecuteTemplate(w, name, data)
 }
 
-type server struct {
-	database db.Database
-}
-
 func InitServer(e *echo.Echo) {
 	s := server{
 		database: &mongo.MongoAPI{
@@ -48,6 +47,7 @@ func InitServer(e *echo.Echo) {
 	e.GET("/p/:id", s.GetPost)
 	e.POST("/p", s.SavePost)
 	e.POST("/p/delete", s.DeletePost)
+	echo.NotFoundHandler = s.NotFoundHandler
 
 	api := e.Group("/api")
 	{
@@ -61,12 +61,36 @@ func InitServer(e *echo.Echo) {
 	}
 }
 
-func (s server) ApiIndex(c echo.Context) error {
-	return c.JSON(200, data("Hello"))
-}
-
 func data(d interface{}) echo.Map {
 	return map[string]interface{}{
 		"data": d,
 	}
+}
+
+type server struct {
+	database db.Database
+}
+
+func (s server) NotFoundHandler(c echo.Context) error {
+	err := fmt.Errorf("resource not found")
+	if strings.HasPrefix(c.Request().URL.Path, "/api") {
+		return c.JSON(404, echo.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return RenderError(c, 404, err, "Not found", "This page doesn't exist anymore")
+}
+
+func Render500(c echo.Context, err error, message string) error {
+	return RenderError(c, http.StatusInternalServerError, err, "Internal Server Error", message)
+}
+
+func RenderError(c echo.Context, code int, err error, title, message string) error {
+	fmt.Println(err)
+	return c.Render(code, "error.html", echo.Map{
+		"Code":    code,
+		"Title":   title,
+		"Message": message,
+	})
 }

@@ -9,7 +9,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// // ApiGetPost get a single post
+// Index for api
+func (s server) ApiIndex(c echo.Context) error {
+	return c.JSON(200, data("Hello"))
+}
+
+// ApiGetPost get a single post
 func (s *server) ApiGetPost(c echo.Context) error {
 	id := c.Param("id")
 	post, err := s.database.GetPostById(c.Request().Context(), id)

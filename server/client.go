@@ -86,16 +86,3 @@ func (s *server) DeletePost(c echo.Context) error {
 
 	return c.Redirect(http.StatusSeeOther, "/")
 }
-
-func Render500(c echo.Context, err error, message string) error {
-	return RenderError(c, http.StatusInternalServerError, err, "Internal Server Error", message)
-}
-
-func RenderError(c echo.Context, code int, err error, title, message string) error {
-	fmt.Println(err)
-	return c.Render(code, "error.html", echo.Map{
-		"Code":    code,
-		"Title":   title,
-		"Message": message,
-	})
-}
